@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import lombok.Data;
 
 /**
- * APIからの返り値をバインドするクラス
+ * 国土地理院APIからの返り値をバインドするクラス
  */
 @Entity
 @Data

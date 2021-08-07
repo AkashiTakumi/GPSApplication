@@ -15,12 +15,15 @@ public class CreateLogDto {
 
     String name;
 
+    String uid;
+
     public Log toEntity() {
         Log log = new Log();
 
         log.setLatitude(latitude);
         log.setLongitude(longitude);
         log.setName(name);
+        log.setUid(uid);
 
         return log;
     }

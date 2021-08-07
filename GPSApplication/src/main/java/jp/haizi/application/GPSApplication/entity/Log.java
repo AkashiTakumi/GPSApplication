@@ -22,4 +22,7 @@ public class Log {
 
     // 場所の名前
     String name;
+
+    // 紐づけるユーザのid
+    String uid;
 }
