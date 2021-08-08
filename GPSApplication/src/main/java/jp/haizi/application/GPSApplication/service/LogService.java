@@ -1,6 +1,7 @@
 package jp.haizi.application.GPSApplication.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -55,7 +56,9 @@ public class LogService {
      * @return
      */
     public Log createLog(CreateLogDto dto){
-        return repo.save(dto.toEntity());
+        Log log = dto.toEntity();
+        log.setLogDate(new Date());
+        return repo.save(log);
     }
 
     /**

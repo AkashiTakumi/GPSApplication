@@ -1,10 +1,10 @@
 package jp.haizi.application.GPSApplication.entity;
 
-import javax.persistence.Entity;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
 
 import lombok.Data;
 
-@Entity
 @Data
 /**
  * YouIdサービスと通信した際の結果をバインドするクラス

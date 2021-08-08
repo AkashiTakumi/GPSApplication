@@ -1,5 +1,7 @@
 package jp.haizi.application.GPSApplication.dto;
 
+import java.util.Date;
+
 import jp.haizi.application.GPSApplication.entity.Log;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +18,8 @@ public class CreateLogDto {
     String name;
 
     String uid;
+
+    Date logDate;
 
     public Log toEntity() {
         Log log = new Log();

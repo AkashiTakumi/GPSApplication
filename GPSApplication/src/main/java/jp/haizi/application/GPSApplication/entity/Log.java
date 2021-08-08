@@ -1,5 +1,7 @@
 package jp.haizi.application.GPSApplication.entity;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,4 +27,7 @@ public class Log {
 
     // 紐づけるユーザのid
     String uid;
+
+    // ログを取った時間
+    Date logDate;
 }

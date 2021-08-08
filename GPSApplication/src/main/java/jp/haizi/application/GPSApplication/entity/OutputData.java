@@ -1,13 +1,12 @@
 package jp.haizi.application.GPSApplication.entity;
 
-import javax.persistence.Entity;
+//import javax.persistence.Entity;
 
 import lombok.Data;
 
 /**
  * 国土地理院APIからの返り値をバインドするクラス
  */
-@Entity
 @Data
 public class OutputData {
     Double geoLength;
