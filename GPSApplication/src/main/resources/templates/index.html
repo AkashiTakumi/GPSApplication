@@ -7,6 +7,11 @@
     <title>距離測定アプリケーション</title>
 </head>
 <body>
-    アプリケーションのメイン画面
+    <h2>[[*{username}]]さん GPSアプリケーションへようこそ！</h2>
+
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="ログアウトする">
+    </form>
+
 </body>
 </html>

@@ -2,6 +2,8 @@ package jp.haizi.application.GPSApplication.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import jp.haizi.application.GPSApplication.dto.CreateUserDto;
@@ -25,9 +27,18 @@ public class YouIdService {
      * @return
      */
     public String getYouId(PostYouIdDto dto) {
-        GetYouId userEntity = restTemplate.postForObject(url, dto, GetYouId.class);
-        String uid = userEntity.getUid();
-        return uid;
+        try {
+            GetYouId userEntity = restTemplate.postForObject(url, dto, GetYouId.class);
+            String uid = userEntity.getUid();
+            return uid;
+        } catch (HttpClientErrorException e) {
+            System.err.println("400系エラー発生");
+            throw e;
+        } catch (HttpServerErrorException e) {
+            System.err.println("500系エラー発生");
+            throw e;
+        }
+        
     }
 
     /**
@@ -42,7 +53,7 @@ public class YouIdService {
             createUserDto.setUsername(dto.getNickname());
             return urepo.save(createUserDto.toEntity());
         } else {
-            if (urepo.findByUsername(dto.getNickname()) == null) {
+            if (urepo.findByUsername(dto.getNickname()) != null) {
                 throw new UserException(UserException.EXISTED_USER, "That username existed!!");
             } else {
                 CreateUserDto createUserDto = new CreateUserDto();

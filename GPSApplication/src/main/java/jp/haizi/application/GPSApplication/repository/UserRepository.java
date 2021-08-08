@@ -13,4 +13,11 @@ public interface UserRepository extends CrudRepository<User, String>{
      * @return
      */
     public User findByUsername(String username);
+
+    /**
+     * uidでuserを検索して返す
+     * @param uid
+     * @return
+     */
+    public User findByUid(String uid);
 }
