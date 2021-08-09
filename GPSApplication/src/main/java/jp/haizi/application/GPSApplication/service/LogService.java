@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import jp.haizi.application.GPSApplication.dto.CreateLogDto;
@@ -36,12 +38,14 @@ public class LogService {
     public Double service(CreateLogDto dto){
         createLog(dto);
         List<Log> list = getLatestLogs(dto.getUid());
+        System.out.println(list);
         if (list.size() == 2) {
             StartEndDto startEndDto = new StartEndDto();
             startEndDto.setLatitudeA(list.get(0).getLatitude());
             startEndDto.setLongitudeA(list.get(0).getLongitude());
             startEndDto.setLatitudeB(list.get(1).getLatitude());
             startEndDto.setLongitudeB(list.get(1).getLongitude());
+            System.out.println(startEndDto);
             return getDistance(startEndDto);
         } else {
             // 一件目を保存したときは取られるリストの要素が一つのみ
@@ -91,15 +95,24 @@ public class LogService {
      */
     public Double getDistance(StartEndDto dto) {
         // エンドポイントの作成
-        endpoint = endpoint + "latitude1=" + dto.getLatitudeA() + "&longitude1=" + dto.getLongitudeA() + "&latitude2=" + dto.getLatitudeB() + "&longitude2=" + dto.getLongitudeB();
-        System.out.println(endpoint);
-        ResponseEntity<OutputData> responseEntity = restTemplate.getForEntity(endpoint, OutputData.class);
-        HttpStatus statusCode = responseEntity.getStatusCode();
-        System.out.println(statusCode);
-        OutputData outputData = responseEntity.getBody();
-
-        Double distance = outputData.getGeoLength();
-
-        return distance;
+        String url = endpoint + "latitude1=" + dto.getLatitudeA() + "&longitude1=" + dto.getLongitudeA() + "&latitude2=" + dto.getLatitudeB() + "&longitude2=" + dto.getLongitudeB();
+        System.out.println("このURLに投げます：" + url);
+        try {
+            ResponseEntity<OutputData> responseEntity = restTemplate.getForEntity(url, OutputData.class);
+            HttpStatus statusCode = responseEntity.getStatusCode();
+            System.out.println(statusCode);
+            OutputData outputData = responseEntity.getBody();
+            System.out.println(outputData);
+    
+            Double distance = Double.parseDouble(outputData.getGeoLength());
+    
+            return distance;
+        } catch (HttpClientErrorException e) {
+            System.err.println("400系エラー発生");
+            throw e;
+        } catch (HttpServerErrorException e) {
+            System.err.println("500系エラー発生");
+            throw e;
+        }
     }
 }

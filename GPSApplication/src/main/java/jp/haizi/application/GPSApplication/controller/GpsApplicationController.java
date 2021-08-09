@@ -1,5 +1,7 @@
 package jp.haizi.application.GPSApplication.controller;
 
+import java.util.Date;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -98,12 +100,16 @@ public class GpsApplicationController {
      * @return
      */
     @GetMapping("/")
-    public String showIndexPage(@CookieValue(name="uid", required = false, defaultValue = "abc")String uid, Model model) {
+    public String showIndexPage(@CookieValue(name="uid", required = false, defaultValue = "abc")String uid, 
+    @ModelAttribute(name = "createLog") CreateLogDto dto, Double distance, Model model) {
         if (urepo.existsById(uid)) {
             User user = urepo.findByUid(uid);
             model.addAttribute("username", user.getUsername());
-            Double length = 0.0;
-            model.addAttribute("length", length);
+            model.addAttribute("createLog", dto);
+            if (distance == null) {
+                distance = 0.0;
+            }
+            model.addAttribute("distance", distance);
             return "index";
         } else {
             return "redirect:/login";
@@ -117,13 +123,22 @@ public class GpsApplicationController {
      * @param model
      * @return
      */
-    @PostMapping("/logging")
-    public String getLength(@CookieValue(name="uid", required = false, defaultValue = "abc")String uid, CreateLogDto dto, Model model) {
+    @PostMapping("/")
+    public String getLength(@CookieValue(name="uid", required = false, defaultValue = "abc")String uid, 
+    @CookieValue(name="latitude", required = false, defaultValue = "35.0")String latitude, 
+    @CookieValue(name="longitude", required = false, defaultValue = "135.0")String longitude, 
+    @ModelAttribute(name = "createLog") CreateLogDto dto, Model model) {
         if (urepo.existsById(uid)) {
             User user = urepo.findByUid(uid);
             model.addAttribute("username", user.getUsername());
-            Double length = logService.service(dto);
-            model.addAttribute("length", length);
+            model.addAttribute("createLog", dto);
+            dto.setUid(uid);
+            dto.setLatitude(Double.parseDouble(latitude));
+            dto.setLongitude(Double.parseDouble(longitude));
+            dto.setLogDate(new Date());
+            Double distance = logService.service(dto);
+            System.out.println(distance);
+            model.addAttribute("distance", distance);
             return "index";
         } else {
             return "redirect:/login";

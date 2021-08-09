@@ -5,9 +5,33 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>距離測定アプリケーション</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+    <script type="text/javascript" th:src="@{/gps.js}"></script>
 </head>
 <body>
     <h2>[[*{username}]]さん GPSアプリケーションへようこそ！</h2>
+
+    <button id="start_gps">GPS情報取得を開始する</button>
+
+    <table border="1">
+        <tr>
+        <th>現在地点の緯度</th>
+        <td><span id="latitude"></span></td>
+        <th>現在地点の経度</th>
+        <td><span id="longitude"></span></td>
+        </tr>
+    </table>
+
+    <form th:action="@{/}" method="post" th:object = "${createLog}">
+        この地点の名前を入力：<input type="text" name="name" id="name">
+        <input type="submit" value="測定">
+    </form>
+
+    <h3>前回測定地点との距離は[[*{distance}]]mです！</h3>
+
+    <div id="message1"></div>
+    <div id="message2"></div>
 
     <form th:action="@{/logout}" method="post">
         <input type="submit" value="ログアウトする">

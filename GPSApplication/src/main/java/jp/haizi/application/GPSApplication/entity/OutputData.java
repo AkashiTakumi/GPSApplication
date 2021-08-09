@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 public class OutputData {
-    Double geoLength;
-    Double azimuth1;
-    Double azimuth2;
+    String geoLength;
+    String azimuth1;
+    String azimuth2;
 }
