@@ -8,6 +8,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -18,6 +20,7 @@ import jp.haizi.application.GPSApplication.dto.CreateLogDto;
 import jp.haizi.application.GPSApplication.dto.StartEndDto;
 import jp.haizi.application.GPSApplication.entity.Log;
 import jp.haizi.application.GPSApplication.entity.OutputData;
+import jp.haizi.application.GPSApplication.entity.Result;
 import jp.haizi.application.GPSApplication.repository.LogRepository;
 
 @Service
@@ -27,6 +30,10 @@ public class LogService {
 
     RestTemplate restTemplate = new RestTemplate();
     public static String endpoint = "http://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/bl2st_calc.pl?outputType=json&ellipsoid=GRS80&";
+
+    //世界観測値系
+    public static final double GRS80_A = 6378137.000;//長半径 a(m)
+    public static final double GRS80_E2 = 0.00669438002301188;//第一遠心率  eの2乗
 
     /**
      * 最新のログを保存するときに同時に前のものと距離を測って返す
@@ -46,7 +53,7 @@ public class LogService {
             startEndDto.setLatitudeB(list.get(1).getLatitude());
             startEndDto.setLongitudeB(list.get(1).getLongitude());
             System.out.println(startEndDto);
-            return getDistance(startEndDto);
+            return getDistance(startEndDto.getLatitudeA(), startEndDto.getLongitudeA(), startEndDto.getLatitudeB(), startEndDto.getLongitudeB());
         } else {
             // 一件目を保存したときは取られるリストの要素が一つのみ
             // 距離とかがないから0を返すようにした
@@ -93,18 +100,25 @@ public class LogService {
      * @param dto
      * @return
      */
+    /*
     public Double getDistance(StartEndDto dto) {
         // エンドポイントの作成
         String url = endpoint + "latitude1=" + dto.getLatitudeA() + "&longitude1=" + dto.getLongitudeA() + "&latitude2=" + dto.getLatitudeB() + "&longitude2=" + dto.getLongitudeB();
         System.out.println("このURLに投げます：" + url);
         try {
-            ResponseEntity<OutputData> responseEntity = restTemplate.getForEntity(url, OutputData.class);
+            System.out.println("国土地理院と通信します");
+            RequestEntity requestEntity = RequestEntity.get(url).accept(MediaType.APPLICATION_JSON).build();
+            ResponseEntity<Result> responseEntity = restTemplate.exchange(requestEntity, Result.class);
+            System.out.println(responseEntity);
             HttpStatus statusCode = responseEntity.getStatusCode();
             System.out.println(statusCode);
-            OutputData outputData = responseEntity.getBody();
-            System.out.println(outputData);
+            Result result = responseEntity.getBody();
+            System.out.println(result);
+            //Result result = restTemplate.getForObject(url, Result.class);
+            //System.out.println(result);
     
-            Double distance = Double.parseDouble(outputData.getGeoLength());
+            Double distance = Double.parseDouble(result.getOutputData().getGeoLength());
+            //Double distance = data.getGeoLength();
     
             return distance;
         } catch (HttpClientErrorException e) {
@@ -114,5 +128,30 @@ public class LogService {
             System.err.println("500系エラー発生");
             throw e;
         }
+    }
+    */
+
+    public static double deg2rad(double deg){
+        return deg * Math.PI / 180.0;
+    }
+
+    public static double getDistance(double lat1, double lng1, double lat2, double lng2){
+        double my = deg2rad((lat1 + lat2) / 2.0); //緯度の平均値
+        double dy = deg2rad(lat1 - lat2); //緯度の差
+        double dx = deg2rad(lng1 - lng2); //経度の差
+
+        //卯酉線曲率半径を求める(東と西を結ぶ線の半径)
+        double sinMy = Math.sin(my);
+        double w = Math.sqrt(1.0 - GRS80_E2 * sinMy * sinMy);
+        double n = GRS80_A / w;
+
+        //子午線曲線半径を求める(北と南を結ぶ線の半径)
+        double mnum = GRS80_A * (1 - GRS80_E2);
+        double m = mnum / (w * w * w);
+
+        //ヒュベニの公式
+        double dym = dy * m;
+        double dxncos = dx * n * Math.cos(my);
+        return Math.sqrt(dym * dym + dxncos * dxncos);
     }
 }
