@@ -53,8 +53,9 @@ public class GpsApplicationController {
         PostYouIdDto dto = new PostYouIdDto();
         dto.setNickname(form.getUsername());
         dto.setName(form.getUsername() + ":GPSApplication");
-        dto.setEmail("GPSApplication@example.com");
+        dto.setEmail("GPS" + form.getUsername() +"@example.com");
         dto.setBirthday("20210809");
+        System.out.println(dto);
         youIdService.createUser(dto);
         return "redirect:/login";
     }
