@@ -7,20 +7,12 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import jp.haizi.application.GPSApplication.dto.CreateLogDto;
 import jp.haizi.application.GPSApplication.dto.StartEndDto;
 import jp.haizi.application.GPSApplication.entity.Log;
-import jp.haizi.application.GPSApplication.entity.OutputData;
-import jp.haizi.application.GPSApplication.entity.Result;
 import jp.haizi.application.GPSApplication.repository.LogRepository;
 
 @Service
@@ -94,42 +86,6 @@ public class LogService {
             return list;
         }
     }
-
-    /**
-     * 二件見つかった場合にのみ呼び出される
-     * @param dto
-     * @return
-     */
-    /*
-    public Double getDistance(StartEndDto dto) {
-        // エンドポイントの作成
-        String url = endpoint + "latitude1=" + dto.getLatitudeA() + "&longitude1=" + dto.getLongitudeA() + "&latitude2=" + dto.getLatitudeB() + "&longitude2=" + dto.getLongitudeB();
-        System.out.println("このURLに投げます：" + url);
-        try {
-            System.out.println("国土地理院と通信します");
-            RequestEntity requestEntity = RequestEntity.get(url).accept(MediaType.APPLICATION_JSON).build();
-            ResponseEntity<Result> responseEntity = restTemplate.exchange(requestEntity, Result.class);
-            System.out.println(responseEntity);
-            HttpStatus statusCode = responseEntity.getStatusCode();
-            System.out.println(statusCode);
-            Result result = responseEntity.getBody();
-            System.out.println(result);
-            //Result result = restTemplate.getForObject(url, Result.class);
-            //System.out.println(result);
-    
-            Double distance = Double.parseDouble(result.getOutputData().getGeoLength());
-            //Double distance = data.getGeoLength();
-    
-            return distance;
-        } catch (HttpClientErrorException e) {
-            System.err.println("400系エラー発生");
-            throw e;
-        } catch (HttpServerErrorException e) {
-            System.err.println("500系エラー発生");
-            throw e;
-        }
-    }
-    */
 
     public static double deg2rad(double deg){
         return deg * Math.PI / 180.0;
